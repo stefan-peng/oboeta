@@ -1,7 +1,7 @@
 
 # The Oboeta Hybrid Index Card System
 
-This collection of scripts helps users manage simple, plain-text collections of flashcards.
+This collection of scripts helps users manage simple, plain-text collections of flashcards.  It focuses on the essence of flashcard systems: scheduling, not generation, display, backups, or synchronization.
 
 "Oboeta" is a Japanese verb in the simple past tense.  It means "remembered" or "memorized".
 
@@ -19,6 +19,13 @@ I love electronic flashcards.  There are so many things to like about them:
 6. They occupy very little physical space.  (Hence (5).)
 
 But I also hate the most popular flashcard programs, such as [Anki][Anki].  They're complex, buggy, too generic, and tied to GUIs and storage formats that make my skin crawl.  (OK, SQLite isn't too bad, but extracting data from it is still a pain in the ass.)  I tried many programs and was never satisfied.  All I wanted was something that operated on plain text and separated flashcards from their metadata.
+
+Plain text is an awesome way to store flashcards and their metadata because:
+
+1. plain text is universal: it'll be around when your grandchildren's grandchildren become worm food;
+2. plain text can be easily edited via any text editor;
+3. plain text files aren't tied to a particular program or library; and
+4. all standard *NIX tools can manipulate plain text files.
 
 And then there's my love for paper flashcards.  I admit that they're a pain to create and manage, but there are reasons to use them:
 
