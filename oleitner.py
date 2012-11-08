@@ -1,15 +1,17 @@
 #!/usr/bin/env python3
 
-# Select Lines from Stdin According to a Leitner Scheduler
-# Written in 2012 by 伴上段
-#
-# To the extent possible under law, the author(s) have dedicated all copyright
-# and related and neighboring rights to this software to the public domain
-# worldwide. This software is distributed without any warranty.
-#
-# You should have received a copy of the CC0 Public Domain Dedication along
-# with this software. If not, see
-# <http://creativecommons.org/publicdomain/zero/1.0/>.
+license="""
+Select Lines from Stdin According to a Leitner Scheduler
+Written in 2012 by 伴上段
+
+To the extent possible under law, the author(s) have dedicated all copyright
+and related and neighboring rights to this software to the public domain
+worldwide. This software is distributed without any warranty.
+
+You should have received a copy of the CC0 Public Domain Dedication along
+with this software. If not, see
+<http://creativecommons.org/publicdomain/zero/1.0/>.
+"""
 
 import argparse
 import csv
@@ -66,7 +68,7 @@ about Leitner scheduling:
 
   Each bucket has an associated delay in days.  When an item is moved into a
   bucket, the item is scheduled for the current date plus that bucket's delay.
-  (The first bucket has no delay.)
+  (The first bucket is implicitly defined and has no delay.)
 
 formatting:
 
@@ -85,17 +87,57 @@ formatting:
   successfully reviewed at the specified time.  What "successfully reviewed"
   means is domain-specific.
 
+  bucketdelay is a delay in days.  It must be a positive integer or zero.
+  The first bucket is implicitly defined with no delay, so you don't have
+  to specify a delay for it.
+
 output:
 
-  This program prints randomly-selected, due lines to stdout.""")
+  This program prints randomly-selected, due lines to stdout.""", epilog="""examples:
+
+  $ oleitner flashcards.txt flashcards.log 1 3 7 14
+
+    Schedule lines from flashcards.txt using flashcards.log as the log file.
+    This uses five buckets with delays of zero, one, three, seven, and fourteen
+    days, respectively.
+
+  $ oleitner -n 20 -e 10 flashcards.txt flashcards.log 1 3 7 14
+
+    Schedule at most 30 lines (at most 20 lines with entries in flashcards.log
+    and at most 10 lines without such entries) from flashcards.txt using
+    flashcards.log as the log file.  This uses the same buckets as in the
+    previous example.
+
+  $ oleitner -s ',' flashcards.txt flashcards.log 1 3 7 14
+
+    Same as the first example, but use a comma as the CSV field separator
+    instead of tab characters.
+
+  $ oleitner -f '%Y/%m/%d' flashcards.txt flashcards.log 1 3 7 14
+
+    Same as the first example, but use the log timestamp format '%Y/%m/%d'
+    instead of the default.
+
+  $ oleitner -b flashcards.txt flashcards.log 1 3 7 14
+
+    Same as the first example, but skip line selection and dump all lines from
+    flashcards.txt to stdout with their bucket numbers prefixed to them.
+    (-1 indicates that the line has no records in the log file.)
+""")
 parser.add_argument("-n", "--num-lines", type=int, default=10, dest="num", help="the maximum number of stdin lines with log records to select (default: 10)")
 parser.add_argument("-e", "--num-new-lines", type=int, default=4, dest="new", help="the maximum number of stdin lines without log records to select (default: 4)")
 parser.add_argument("-s", "--field-sep", default="\t", help="the CSV field separator (default: \\t)")
-parser.add_argument("-b", "--show-buckets", default=False, action="store_true", help="just dump the cards to standard output along with their current bucket numbers (the bucket number is the first field of each line in the output)")
+parser.add_argument("-f", "--date-format", default="%Y年%m月%d日%H時%M分%S秒", help="the format of dates/timestamps in the log file (uses date/strftime flags, default: %%Y年%%m月%%d日%%H時%%M分%%S秒)")
+parser.add_argument("-b", "--show-buckets", default=False, action="store_true", help="just dump the lines to standard output along with their current bucket numbers (the bucket number is the first field of each line in the output, -1 for lines without log entries)")
+parser.add_argument("-l", "--license", default=False, action="store_true", help="print this program's license to stdout and exit")
 parser.add_argument("deckfile", help="a CSV-formatted file containing scheduled lines")
 parser.add_argument("logfile", help="a CSV-formatted file containing records for the deck's lines")
-parser.add_argument("-f", "--date-format", default="%Y年%m月%d日%H時%M分%S秒", help="the format of dates/timestamps in the log file (uses date/strftime flags, default: %%Y年%%m月%%d日%%H時%%M分%%S秒)")
 parser.add_argument("bucketdelay", type=int, nargs="+", help="the number of days to add to a line's due date when it's moved to the corresponding Leitner bucket")
+
+if any(arg == "-l" for arg in sys.argv[1:]):
+  print(license)
+  sys.exit(0)
+
 args = parser.parse_args()
 
 class TBucket(object):
@@ -214,7 +256,7 @@ def Main():
   # do so now and exit.
   if args.show_buckets:
     for line in lines.values():
-      print(args.field_sep.join(itertools.chain((str(line.bucket.id if line.bucket is not None else "0"),), line.fields)))
+      print(args.field_sep.join(itertools.chain((str(line.bucket.id if line.bucket is not None else "-1"),), line.fields)))
     sys.exit(0)
 
   # Figure out which lines are due now.  This also filters out TLines that
