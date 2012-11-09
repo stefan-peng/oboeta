@@ -71,6 +71,14 @@ Open a terminal, navigate to the directory containing this collection's source c
 
 This will copy the scripts to the specified directory.  You might have to change users (e.g., run `sudo`) depending on which installation directory you select.
 
+## Sample Framework Built on Oboeta
+
+If you want an example of a framework built on top of Oboeta, see the "example" subdirectory.  It contains my Japanese flashcard system along with an early snapshot of my sentence deck and log.  I use all of the scripts in the directory; you're free to use them, too.  NOTE: Some of the Japanese-specific scripts depend on [Hinomoto][Hinomoto], a small collection of programs for parsing and tagging Unicode text.  Of course, you can remove these dependencies.
+
+My system works like this: I place the scripts into a directory and create four subdirectories: decks, media, backups, and other.  "decks" contains my deck and log files.  "media" contains two subdirectories: "sds" for downloaded kanji stroke order diagrams and "recordings" for audio recordings of my flashcards.  "backups" is where I store bzipped TAR archives of flashcards and media.  "other" contains miscellaneous stuff.
+
+The most essential scripts are `edeck`, `genline`, `pass`, `fail`, and `grabsome`.  They should be easy to understand: Open them with your favorite text editor and check them out.
+
 ## License
 
 All of the files in this collection have been dedicated to the public domain via the Creative Commons CC0 Public Domain Dedication in the hope that they would be circulated widely and without restriction.  I won't make any money from this code and I feel that it's more important that other people are free to use, modify, and distribute it as they please, with or without charge, even if I could make money from this.  Simply put, I like contributing to a healthy public domain.  See the file `COPYING` for a complete copy of the public domain dedication.

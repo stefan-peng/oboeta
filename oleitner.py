@@ -225,7 +225,7 @@ def Main():
       try:
         date_time = datetime.datetime.strptime(fields[1], args.date_format)
       except ValueError as e:
-        sys.stderr.write(args.logfile + ":" + str(lineno) + ": invalid date format\n")
+        sys.stderr.write(args.logfile + ":" + str(lineno) + ": invalid date format: " + str(e) + "\n")
         sys.exit(3)
       entry = lines.get(fields[0], None)
       if entry is None:

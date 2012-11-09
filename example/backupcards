@@ -1,0 +1,16 @@
+#!/bin/sh
+
+# Back Up Everything in the Current Directory Except "media" and "other" to
+# the "backups" Directory
+# Written in 2012 by 伴上段
+#
+# To the extent possible under law, the author(s) have dedicated all copyright
+# and related and neighboring rights to this software to the public domain
+# worldwide. This software is distributed without any warranty.
+#
+# You should have received a copy of the CC0 Public Domain Dedication along
+# with this software. If not, see
+# <http://creativecommons.org/publicdomain/zero/1.0/>.
+
+tar -cv `ls | grep -v 'backups' | grep -v 'media' | grep -v 'other'` | bzip2 -9 >backups/`date +'%Y年%m月%d日%H時%M分%S秒'`.cards.tar.bz2
+
