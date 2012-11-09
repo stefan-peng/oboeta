@@ -93,4 +93,5 @@ I wrote these scripts by myself primarily for myself, but I hope that others wil
 [Anki]: http://ankisrs.net/ "The Anki SRS Program"
 [CSV]: http://en.wikipedia.org/wiki/Comma-separated_values "Comma-Separated Values on Wikipedia"
 [Python]: http://www.python.org/download/releases/ "Python Releases"
+[Hinomoto]: https://github.com/joodan-van-github/hinomoto "The Hinomoto Script Collection"
 
