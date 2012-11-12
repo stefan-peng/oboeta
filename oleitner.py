@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 license="""
-Select Lines from Stdin According to a Leitner Scheduler
+Select Lines from a CSV File According to a Leitner Scheduler
 Written in 2012 by 伴上段
 
 To the extent possible under law, the author(s) have dedicated all copyright
@@ -13,16 +13,7 @@ with this software. If not, see
 <http://creativecommons.org/publicdomain/zero/1.0/>.
 """
 
-import argparse
-import csv
-import datetime
-import heapq
-import itertools
-import os
-import os.path
-import random
-import time
-import sys
+import argparse, csv, datetime, heapq, itertools, os.path, random, sys
 
 if __name__ != "__main__":
   sys.stderr.write("This is meant to be run as a script, not imported like a library.\n")
@@ -124,8 +115,8 @@ output:
     flashcards.txt to stdout with their bucket numbers prefixed to them.
     (-1 indicates that the line has no records in the log file.)
 """)
-parser.add_argument("-n", "--num-lines", type=int, default=10, dest="num", help="the maximum number of stdin lines with log records to select (default: 10)")
-parser.add_argument("-e", "--num-new-lines", type=int, default=4, dest="new", help="the maximum number of stdin lines without log records to select (default: 4)")
+parser.add_argument("-n", "--num-lines", type=int, default=10, dest="num", help="the maximum number of lines with log records to select (default: 10)")
+parser.add_argument("-e", "--num-new-lines", type=int, default=4, dest="new", help="the maximum number of lines without log records to select (default: 4)")
 parser.add_argument("-s", "--field-sep", default="\t", help="the CSV field separator (default: \\t)")
 parser.add_argument("-f", "--date-format", default="%Y年%m月%d日%H時%M分%S秒", help="the format of dates/timestamps in the log file (uses date/strftime flags, default: %%Y年%%m月%%d日%%H時%%M分%%S秒)")
 parser.add_argument("-b", "--show-buckets", default=False, action="store_true", help="just dump the lines to standard output along with their current bucket numbers (the bucket number is the first field of each line in the output, -1 for lines without log entries)")
@@ -180,100 +171,87 @@ class TLine(object):
     self.bucket = self.bucket.next
     self.bucket.Add(self, dateandtime)
 
-def Main():
-  # Check arguments for illegal values.
-  ret = 0
-  if args.num < 0:
-    sys.stderr.write("The number of lines cannot be negative.\n")
-    ret = 2
-  if args.new < 0:
-    sys.stderr.write("The number of lines cannot be negative.\n")
-    ret = 2
-  if any(bucket <= 0 for bucket in args.bucketdelay):
-    sys.stderr.write("Zero and negative bucket delays are not allowed.\n")
-    ret = 2
-  if not os.path.exists(args.deckfile):
-    sys.stderr.write("The deck " + args.deckfile + " does not exist.\n")
-    ret = 2
-  if not os.path.exists(args.logfile):
-    sys.stderr.write("The log " + args.logfile + " does not exist.\n")
-    ret = 2
-  if ret != 0:
-    sys.exit(ret)
+# Check arguments for illegal values.
+ret = 0
+if args.num < 0:
+  sys.stderr.write("The number of lines cannot be negative.\n")
+  ret = 2
+if args.new < 0:
+  sys.stderr.write("The number of lines cannot be negative.\n")
+  ret = 2
+if any(bucket <= 0 for bucket in args.bucketdelay):
+  sys.stderr.write("Zero and negative bucket delays are not allowed.\n")
+  ret = 2
+if not os.path.exists(args.deckfile):
+  sys.stderr.write("The deck " + args.deckfile + " does not exist.\n")
+  ret = 2
+if not os.path.exists(args.logfile):
+  sys.stderr.write("The log " + args.logfile + " does not exist.\n")
+  ret = 2
+if ret != 0:
+  sys.exit(ret)
 
-  # Create the list of buckets from the client-specified delays.
-  bucket = TBucket(0, None, None, datetime.timedelta(days=0))
-  buckets = [bucket]
-  first_bucket = bucket
+# Create the list of buckets from the client-specified delays.
+bucket = TBucket(0, None, None, datetime.timedelta(days=0))
+first_bucket = bucket
+bucket.next = bucket
+bucket.first = bucket
+for bucket_id, delay in enumerate(args.bucketdelay, start=1):
+  bucket.next = TBucket(bucket_id, first_bucket, None, datetime.timedelta(days=delay))
+  bucket = bucket.next
   bucket.next = bucket
-  bucket.first = bucket
-  for bucket_id, delay in enumerate(args.bucketdelay, start=1):
-    bucket.next = TBucket(bucket_id, first_bucket, None, datetime.timedelta(days=delay))
-    bucket = bucket.next
-    bucket.next = bucket
-    bucket.first = first_bucket
-    buckets.append(bucket)
 
-  # Process the log file.  Create a TLine for each new unique ID encountered
-  # and track its progress as it hops across buckets.
-  lines = {}
-  with open(args.logfile, 'r') as logf:
-    for lineno, fields in enumerate(csv.reader(logf, delimiter=args.field_sep)):
-      if len(fields) != 3:
-        sys.stderr.write(args.logfile + ":" + str(lineno) + ": invalid number of fields: " + str(len(fields)) + "\n")
-        sys.exit(3)
-      try:
-        date_time = datetime.datetime.strptime(fields[1], args.date_format)
-      except ValueError as e:
-        sys.stderr.write(args.logfile + ":" + str(lineno) + ": invalid date format: " + str(e) + "\n")
-        sys.exit(3)
-      entry = lines.get(fields[0], None)
-      if entry is None:
-        entry = TLine(fields[0], None, first_bucket)
-        lines[fields[0]] = entry 
-      if fields[2] == '+':
-        entry.Promote(date_time)
-      elif fields[2] == '-':
-        entry.Demote(date_time)
-      else:
-        sys.stderr.write(args.logfile + ":" + str(lineno) + ": invalid mutation in third field: must be + or -\n")
-        sys.exit(3)
+# Process the log file.  Create a TLine for each new unique ID encountered
+# and track its progress as it hops across buckets.
+lines = {}
+with open(args.logfile, 'r') as logf:
+  for lineno, fields in enumerate(csv.reader(logf, delimiter=args.field_sep)):
+    if len(fields) != 3:
+      sys.stderr.write(args.logfile + ":" + str(lineno) + ": invalid number of fields: " + str(len(fields)) + "\n")
+      sys.exit(3)
+    try:
+      date_time = datetime.datetime.strptime(fields[1], args.date_format)
+    except ValueError as e:
+      sys.stderr.write(args.logfile + ":" + str(lineno) + ": invalid date format: " + str(e) + "\n")
+      sys.exit(3)
+    entry = lines.get(fields[0], None)
+    if entry is None:
+      entry = TLine(fields[0], None, first_bucket)
+      lines[fields[0]] = entry 
+    if fields[2] == '+':
+      entry.Promote(date_time)
+    elif fields[2] == '-':
+      entry.Demote(date_time)
+    else:
+      sys.stderr.write(args.logfile + ":" + str(lineno) + ": invalid mutation in third field: must be + or -\n")
+      sys.exit(3)
 
-  # Process the lines from the deck.  Match each line with its record in the
-  # lines dictionary (if such a record exists).  Lines lacking log entries are
-  # marked as "new" by setting their buckets to None.
-  now = datetime.datetime.now()
-  with open(args.deckfile, 'r') as df:
-    for lineno, fields in enumerate(csv.reader(df, delimiter=args.field_sep)):
-      if len(fields) == 0:
-        continue
-      if fields[0] not in lines:
-        lines[fields[0]] = TLine(fields[0], now, None, fields)
-      else:
-        lines[fields[0]].fields = fields
+# Process the lines from the deck.  Match each line with its record in the
+# lines dictionary (if such a record exists).  Lines lacking log entries are
+# marked as "new" by setting their buckets to None.
+now = datetime.datetime.now()
+with open(args.deckfile, 'r') as df:
+  for lineno, fields in enumerate(csv.reader(df, delimiter=args.field_sep)):
+    if len(fields) == 0:
+      continue
+    if fields[0] not in lines:
+      lines[fields[0]] = TLine(fields[0], now, None, fields)
+    else:
+      lines[fields[0]].fields = fields
 
-  # Early out: If we only need to show the lines and their bucket numbers, then
-  # do so now and exit.
-  if args.show_buckets:
-    for line in lines.values():
-      print(args.field_sep.join(itertools.chain((str(line.bucket.id if line.bucket is not None else "-1"),), line.fields)))
-    sys.exit(0)
+# Early out: If we only need to show the lines and their bucket numbers, then
+# do so now and exit.
+if args.show_buckets:
+  for line in lines.values():
+    print(args.field_sep.join(itertools.chain((str(line.bucket.id if line.bucket is not None else "-1"),), line.fields)))
+  sys.exit(0)
 
-  # Figure out which lines are due now.  This also filters out TLines that
-  # lacked corresponding lines in the deck file.
-  due_now = [line for line in lines.values() if line.date <= now and line.fields is not None]
-  del lines
-
-  # Randomly select due lines that have already been reviewed (i.e., lines with
-  # records in the log file) and new lines (lines lacking such records).
-  # Combine the results and print them to standard output.
-  due_selector = TRandomSelector(args.num)
-  new_selector = TRandomSelector(args.new)
-  for card in due_now:
-    (due_selector if card.bucket else new_selector).Add(card)
-  del due_now
-  for card in itertools.chain(due_selector, new_selector):
-    print(args.field_sep.join(card.fields))
-
-Main()
+# Randomly select due lines that have already been reviewed (i.e., lines with
+# records in the log file) and new lines (lines lacking such records).
+# Combine the results and print them to standard output.
+due_selector, new_selector = TRandomSelector(args.num), TRandomSelector(args.new)
+for line in (line for line in lines.values() if line.date <= now and line.fields is not None):
+  (due_selector if line.bucket else new_selector).Add(line)
+for line in itertools.chain(due_selector, new_selector):
+  print(args.field_sep.join(line.fields))
 
