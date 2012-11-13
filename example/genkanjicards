@@ -33,9 +33,9 @@ cleanup() {
 trap cleanup EXIT
 
 tmpfile=`mktemp genkanjicards.holdings.XXXXXXXXX`
-dunicode | uniquhan | eunicode -n >$tmpfile
-for kanji in `sort decks/$1.txt | comm -2 -3 $tmpfile -`; do
-  echo "`nextid`	$kanji	" >>decks/$1.txt
+dunicode | uniquhan >$tmpfile
+for kanji in `dunicode <decks/$1.txt | uniquhan | comm -2 -3 $tmpfile - | eunicode -n`; do
+  echo "`nextid`	`carddate`	$kanji	" >>decks/$1.txt
 done
 
 edeck $1
