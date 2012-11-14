@@ -37,9 +37,9 @@ And then there's my love for paper flashcards.  I admit that they're a pain to c
 
 ### The Solution
 
-I wrote Oboeta to combine electronic and paper flashcards into a hybrid system.  The scripts are deliberately minimalistic so that you can format the flashcard data however you want.  Although I wrote Oboeta to help me maintain a hybrid flashcard system, I could build a full-featured flashcard program on top of it.  But I don't plan to.  (^_^)
+I wrote Oboeta to combine electronic and paper flashcards into a hybrid system.  The scripts are deliberately minimalistic so that you can format the flashcard data however you want.  Although I wrote Oboeta to help me maintain a hybrid flashcard system, I could build a full-featured flashcard program on top of it.  But I don't plan to.  (^_^)  However, it does provide a barely-functional console-based review system.
 
-Here's how the hybrid system works: You maintain a collection of paper flashcards organized any way you like provided that each one has a unique identifier.  (I use monotonically-increasing positive integers for mine.)  On the electronic side, you maintain two plain UTF-8-encoded text files:
+Here's how the system works: You maintain a collection of (paper) flashcards organized any way you like provided that each one has a unique identifier.  (I use monotonically-increasing positive integers for mine.)  On the electronic side, you maintain two plain UTF-8-encoded text files:
 
 1. a [CSV][CSV] file (the "deck") containing one flashcard per line, each beginning with the flashcard's unique identifier; and
 2. a CSV file (the "log") containing records of flashcard reviews.
@@ -53,7 +53,7 @@ On the other hand, the requirements for the log are more stringent:
 3. The timestamp can be formatted however you wish, but you must be consistent.
 4. The third field must be either a single '+' character or a single '-' character.  '+' indicates that you successfully reviewed the associated flashcard on the date represented by the timestamp, whereas '-' indicates that you failed.
 
-Oboeta uses the log to schedule flashcards for review.  You ask Oboeta to dump a bunch of new or due cards to the screen, select the corresponding paper flashcards, and review them.  When you're finished reviewing your cards, update the log accordingly.
+Oboeta uses the log to schedule flashcards for review.  You ask Oboeta to dump a bunch of new or due cards to the screen, select the corresponding paper flashcards, and review them.  When you're finished reviewing your cards, update the log accordingly.  Alternatively, you can use the console-based review scripts, which will automatically update the log.
 
 ## Requirements
 
@@ -62,10 +62,12 @@ I wrote most of the code in [Python 3][Python].  (Die-hard Python 2 fans can cry
 ## The Scripts
 
 * `oleitner` -- process the deck and log files and display flashcards for review on standard output
+* `oboeta` -- review some new and due flashcards from a deck using standard input and standard output without explicitly scheduling them (suitable for text-only flashcards, also good for reviewing random cards while ignoring schedules)
+* `review` -- combines `oleitner` and `oboeta`; also suitable for Android environments with [SL4A][SL4A].
 
 ## Installing
 
-Open a terminal, navigate to the directory containing this collection's source code, and execute the `install.sh` script, passing the directory where you want to install executables as the first parameter.  For example:
+Open a terminal, navigate to the directory containing Oboeta's source code, and execute the `install.sh` script, passing the directory where you want to install executables as the first parameter.  For example:
 
     $ ./install.sh /usr/bin
 
@@ -77,7 +79,7 @@ If you want an example of a framework built on top of Oboeta, see the "example" 
 
 My system works like this: I place the scripts into a directory and create four subdirectories: decks, media, backups, and other.  "decks" contains my deck and log files.  "media" contains two subdirectories: "sds" for downloaded kanji stroke order diagrams and "recordings" for audio recordings of my flashcards.  "backups" is where I store bzipped TAR archives of flashcards and media.  "other" contains miscellaneous stuff.
 
-The most essential scripts are `edeck`, `genline`, `pass`, `fail`, and `grabsome`.  They should be easy to understand: Open them with your favorite text editor and check them out.
+The most essential scripts are `edeck`, `genline`, `pass`, `fail`, `grabsome`, and `reviewsome`.  They should be easy to understand: Open them with your favorite text editor and check them out.
 
 ## License
 
@@ -94,4 +96,5 @@ I wrote these scripts by myself primarily for myself, but I hope that others wil
 [CSV]: http://en.wikipedia.org/wiki/Comma-separated_values "Comma-Separated Values on Wikipedia"
 [Python]: http://www.python.org/download/releases/ "Python Releases"
 [Hinomoto]: https://github.com/joodan-van-github/hinomoto "The Hinomoto Script Collection"
+[SL4A]: http://code.google.com/p/android-scripting "The Scripting Layer for Android"
 
