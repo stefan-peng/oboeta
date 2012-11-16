@@ -96,16 +96,13 @@ showing_back = False
 logf = None
 
 class TServer(BaseHTTPRequestHandler):
-  def __init__(self, *vargs, **kwargs):
-    super().__init__(*vargs, **kwargs)
-    self.error_content_type = "text/plain"
-
   def do_GET(self):
     global reviewing_cards
     global failed_cards
     global card
     global showing_back
     global logf
+    self.error_content_type = "text/plain"
     if self.path != "/favicon.ico":
       if card is not None:
         if showing_back:
@@ -125,29 +122,26 @@ class TServer(BaseHTTPRequestHandler):
         if not reviewing_cards:
           reviewing_cards, failed_cards = failed_cards, reviewing_cards
           if not reviewing_cards:
-            self.send_response(200)
-            self.send_header("Content-Type", "text/plain")
-            message = "Done!\r\n"
-            self.send_header("Content-Length", str(len(message)))
-            self.end_headers()
-            self.wfile.write(message)
+            self.Send("text/plain", bytes("Done!\r\n", encoding="UTF-8"))
             return
           shuffle(reviewing_cards)
         card = reviewing_cards.pop()
         showing_back = False
-      message = bytes("""<!DOCTYPE html><html><head><meta charset="UTF-8" /><title>Review</title></head><body style="text-align: center; font: """ + str(args.font_size) + """pt """ + args.font + """"><div>""" + card[2 if showing_back else 1] + """</div>""" + ("""<div><a href="/fail">Fail</a> &middot; <a href="/pass">Pass</a></div>""" if showing_back else """<div><a href="/show">Show</a></div>""") + """</body></html>\r\n""", encoding="UTF-8")
-      self.send_response(200)
-      self.send_header("Content-Type", "text/html")
-      self.send_header("Content-Length", str(len(message)))
-      self.end_headers()
-      left = len(message)
-      while left:
-        written = self.wfile.write(message)
-        message = message[written:]
-        left -= written
+      self.Send("text/html", bytes("""<!DOCTYPE html><html><head><meta charset="UTF-8" /><title>Review</title></head><body style="text-align: center; font: """ + str(args.font_size) + """pt """ + args.font + """"><div>""" + card[2 if showing_back else 1] + """</div>""" + ("""<div><a href="/fail">Fail</a> &middot; <a href="/pass">Pass</a></div>""" if showing_back else """<div><a href="/show">Show</a></div>""") + """</body></html>\r\n""", encoding="UTF-8"))
     else:
       self.send_error(404)
       self.end_headers()
+
+  def Send(self, mime, message):
+    self.send_response(200)
+    self.send_header("Content-Type", mime)
+    self.send_header("Content-Length", str(len(message)))
+    self.end_headers()
+    left = len(message)
+    while left:
+      written = self.wfile.write(message)
+      message = message[written:]
+      left -= written
 
 maxfield = max(args.front_field_id, args.back_field_id)
 for lineno, fields in enumerate(reader(stdin, delimiter=args.field_sep)):
