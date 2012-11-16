@@ -153,6 +153,7 @@ for lineno, fields in enumerate(reader(stdin, delimiter=args.field_sep)):
 shuffle(reviewing_cards)
 try:
   logf = open(args.logfile, 'a')
+  print("http://localhost:" + str(args.port))
   HTTPServer(('', args.port), TServer).serve_forever()
 except KeyboardInterrupt:
   pass

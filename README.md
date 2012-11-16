@@ -1,7 +1,7 @@
 
 # The Oboeta Hybrid Index Card System
 
-This collection of scripts helps users manage simple, plain-text collections of flashcards.  It focuses on the essence of flashcard systems: scheduling, not generation, display, backups, or synchronization.
+This collection of simple scripts helps users manage simple, plain-text collections of flashcards.  It focuses on the essence of flashcard systems: scheduling.  It also provides some very simple programs for displaying flashcards.
 
 "Oboeta" is a Japanese verb in the simple past tense.  It means "remembered" or "memorized".
 
@@ -25,7 +25,7 @@ Plain text is an awesome way to store flashcards and their metadata because:
 1. plain text is universal: it'll be around when your grandchildren's grandchildren become worm food;
 2. plain text can be easily edited via any text editor;
 3. plain text files aren't tied to a particular program or library; and
-4. all standard *NIX tools can manipulate plain text files.
+4. all standard UNIX/POSIX tools can manipulate plain text files.
 
 And then there's my love for paper flashcards.  I admit that they're a pain to create and manage, but there are reasons to use them:
 
@@ -37,7 +37,7 @@ And then there's my love for paper flashcards.  I admit that they're a pain to c
 
 ### The Solution
 
-I wrote Oboeta to combine electronic and paper flashcards into a hybrid system.  The scripts are deliberately minimalistic so that you can format the flashcard data however you want.  Although I wrote Oboeta to help me maintain a hybrid flashcard system, I could build a full-featured flashcard program on top of it.  But I don't plan to.  (^_^)  However, it does provide a barely-functional console-based review system.
+I wrote Oboeta to combine electronic and paper flashcards into a hybrid system.  The scripts are deliberately minimalistic so that you can format the flashcard data however you want.  Although I wrote Oboeta to help me maintain a hybrid flashcard system, I could build a full-featured flashcard program on top of it.  But I don't plan to.  (^_^)  However, it does provide a barely-functional console- and HTTP-based review system.
 
 Here's how the system works: You maintain a collection of (paper) flashcards organized any way you like provided that each one has a unique identifier.  (I use monotonically-increasing positive integers for mine.)  On the electronic side, you maintain two plain UTF-8-encoded text files:
 
@@ -48,12 +48,12 @@ Oboeta is agnostic about the deck's data: It only expects that the file is a CSV
 
 On the other hand, the requirements for the log are more stringent:
 
-1. Each nonempty line must have exactly three fields: a flashcard's identifier, a timestamp, and either of the '+' or '-' characters.
+1. Each nonempty line must have exactly three fields: a flashcard's identifier, a timestamp, and either of the '+' and '-' characters.
 2. The flashcard's identifier need not actually name a flashcard.  (This makes deleting flashcards easy: Just remove them from the deck.  You can remove their entries in the log, too, but you don't have to.)
 3. The timestamp can be formatted however you wish, but you must be consistent.
 4. The third field must be either a single '+' character or a single '-' character.  '+' indicates that you successfully reviewed the associated flashcard on the date represented by the timestamp, whereas '-' indicates that you failed.
 
-Oboeta uses the log to schedule flashcards for review.  You ask Oboeta to dump a bunch of new or due cards to the screen, select the corresponding paper flashcards, and review them.  When you're finished reviewing your cards, update the log accordingly.  Alternatively, you can use the console-based review scripts, which will automatically update the log.
+Oboeta uses the log to schedule flashcards for review.  You ask Oboeta to dump a bunch of new or due cards to the screen, select the corresponding paper flashcards, and review them.  When you're finished reviewing your cards, update the log accordingly.  Alternatively, you can use the console- and HTTP-based review scripts to review the cards on your computer, which will automatically update the log.
 
 ## Requirements
 
@@ -61,10 +61,10 @@ I wrote most of the code in [Python 3][Python].  (Die-hard Python 2 fans can cry
 
 ## The Scripts
 
-* `oleitner` -- process the deck and log files and display flashcards for review on standard output
+* `oleitner` -- process the deck and log files and display flashcards that are due for review on standard output
 * `oboeta` -- review some new and due flashcards from a deck using standard input and standard output without explicitly scheduling them (suitable for text-only flashcards, also good for reviewing random cards while ignoring schedules)
-* `review` -- combines `oleitner` and `oboeta`; also suitable for Android environments with [SL4A][SL4A].
-* `httpreview` -- like `oboeta`, but read cards from standard input and serve cards as HTTP on the local host instead of reviewing on the console
+* `review` -- combines `oleitner` and `oboeta`; also suitable for Android environments with [SL4A][SL4A]
+* `httpreview` -- like `oboeta`, but read cards from standard input and serve cards over HTTP on the local host instead of displaying them on the console
 
 ## Installing
 
@@ -76,7 +76,7 @@ This will copy the scripts to the specified directory.  You might have to change
 
 ## Sample Framework Built on Oboeta
 
-If you want an example of a framework built on top of Oboeta, see the "example" subdirectory.  It contains my Japanese flashcard system along with an early snapshot of my sentence deck and log.  I use all of the scripts in the directory; you're free to use them, too.  NOTE: Some of the Japanese-specific scripts depend on [Hinomoto][Hinomoto], a small collection of programs for parsing and tagging Unicode text.  Of course, you can remove these dependencies.  Most of the scripts use the Bourne shell (`sh`) and the standard `awk`, `date`, and `sort` utilities.
+If you want an example of a framework built on top of Oboeta, see the "example" subdirectory.  It contains my Japanese flashcard system along with an early snapshot of my sentence deck and log.  I use all of the scripts in the directory; you're free to use them, too.  NOTE: Some of the Japanese-specific scripts depend on [Hinomoto][Hinomoto], a small collection of programs for parsing and tagging Unicode text.  Of course, you can remove these dependencies.  Most of the scripts use the Bourne shell (`sh`) and the standard `awk`, `date`, `sed`, and `sort` utilities.
 
 My system works like this: I place the scripts into a directory and create four subdirectories: decks, media, backups, and other.  "decks" contains my deck and log files.  "media" contains two subdirectories: "sds" for downloaded kanji stroke order diagrams and "recordings" for audio recordings of my flashcards.  "backups" is where I store bzipped TAR archives of flashcards and media.  "other" contains miscellaneous stuff.
 
