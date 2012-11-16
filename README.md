@@ -64,6 +64,7 @@ I wrote most of the code in [Python 3][Python].  (Die-hard Python 2 fans can cry
 * `oleitner` -- process the deck and log files and display flashcards for review on standard output
 * `oboeta` -- review some new and due flashcards from a deck using standard input and standard output without explicitly scheduling them (suitable for text-only flashcards, also good for reviewing random cards while ignoring schedules)
 * `review` -- combines `oleitner` and `oboeta`; also suitable for Android environments with [SL4A][SL4A].
+* `httpreview` -- like `oboeta`, but read cards from standard input and serve cards as HTTP on the local host instead of reviewing on the console
 
 ## Installing
 

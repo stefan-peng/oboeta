@@ -13,7 +13,7 @@
 # <http://creativecommons.org/publicdomain/zero/1.0/>.
 
 usage() {
-  echo "Usage: `basename $0` [-h] deck-name-no-extension card-text"
+  echo "Usage: `basename $0` [-h] deck-name-no-extension card-text [card-text ...]"
 }
 
 if [ $# -eq 1 -a "$1" = "-h" ]; then
@@ -24,7 +24,12 @@ elif [ $# -lt 2 ]; then
   exit 1
 fi
 
-deck=decks/$1.txt
-echo "`./nextid`	`./carddate`	$2	`echo $2 | dunicode | annouhan '[' ':]' | eunicode`" | tee -a $deck
-exec edeck $1
+deckname=$1
+shift
+deck=decks/$deckname.txt
+while [ $# -ne 0 ]; do
+  echo "`./nextid`	`./carddate`	$1	`echo $1 | dunicode | annouhan '[' ':]' | eunicode`" | tee -a $deck
+  shift
+done
+exec edeck $deckname
 

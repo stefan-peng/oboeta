@@ -38,15 +38,19 @@ parser.add_argument("bucketdelay", type=int, nargs="+", help="the number of days
 parser.add_argument("front_field_id", type=int, help="the zero-based field index for the front size of the card")
 parser.add_argument("back_field_id", type=int, help="the zero-based field index for the back side of the card")
 
-if any(arg == "-l" for arg in sys.argv[1:]):
-  print(license)
-  sys.exit(0)
-args = parser.parse_args()
+def Main(args):
+  if any(arg == "-l" for arg in args):
+    print(license)
+    return 0;
+  args = parser.parse_args(args)
 
-tfile = tempfile.TemporaryFile(mode='w+')
-ret = oleitner.Main(tfile, args.num, args.new, args.bucketdelay, args.logfile, args.deckfile, args.field_sep, args.date_format, False)
-if ret == 0:
-  tfile.seek(0)
-  ret = oboeta.Main(tfile, args.logfile, args.field_sep, args.front_field_id, args.back_field_id, args.date_format, args.dry_run)
-exit(ret)
+  tfile = tempfile.TemporaryFile(mode='w+')
+  ret = oleitner.Main(tfile, args.num, args.new, args.bucketdelay, args.logfile, args.deckfile, args.field_sep, args.date_format, False)
+  if ret == 0:
+    tfile.seek(0)
+    ret = oboeta.Main(tfile, args.logfile, args.field_sep, args.front_field_id, args.back_field_id, args.date_format, args.dry_run)
+  return ret
+
+if __name__ == "__main__":
+  exit(Main(sys.argv[1:]))
 
