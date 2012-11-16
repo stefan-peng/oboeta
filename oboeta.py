@@ -68,11 +68,11 @@ def Main(deckfile, logfile, field_sep, front_field_id, back_field_id, date_forma
           answer = input("Correct [Y/n]? ").lower().strip()
           if answer == "y" or answer == "yes" or answer == "":
             if not is_dry_run:
-              logf.write(card[0] + "\t" + datetime.now().strftime(date_format) + "\t+\n")
+              logf.write(card[0] + field_sep + datetime.now().strftime(date_format) + field_sep + "+\n")
             break
           elif answer == "n" or answer == "no":
             if not is_dry_run:
-              logf.write(card[0] + "\t" + datetime.now().strftime(date_format) + "\t-\n")
+              logf.write(card[0] + field_sep + datetime.now().strftime(date_format) + field_sep + "-\n")
             failed_cards.append(card)
             break
           else:

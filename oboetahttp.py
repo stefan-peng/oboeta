@@ -108,12 +108,12 @@ class TServer(BaseHTTPRequestHandler):
         if showing_back:
           if self.path.lower() == "/pass":
             if not args.dry_run:
-              logf.write(card[0] + "\t" + datetime.now().strftime(args.date_format) + "\t+\n")
+              logf.write(card[0] + args.field_sep + datetime.now().strftime(args.date_format) + args.field_sep + "+\n")
               logf.flush()
           else:
             failed_cards.append(card)
             if not args.dry_run:
-              logf.write(card[0] + "\t" + datetime.now().strftime(args.date_format) + "\t-\n")
+              logf.write(card[0] + args.field_sep + datetime.now().strftime(args.date_format) + args.field_sep + "-\n")
               logf.flush()
           card = None
         else:
