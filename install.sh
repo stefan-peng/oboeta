@@ -23,6 +23,6 @@ fi
 set -x
 install -m 0555 oleitner.py $1/oleitner
 install -m 0555 oboeta.py $1/oboeta
-install -m 0555 review.py $1/review
 install -m 0555 oboetahttp.py $1/oboetahttp
+install -m 0555 oboetatty.py $1/oboetatty
 
