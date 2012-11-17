@@ -1,7 +1,7 @@
 
 # The Oboeta Hybrid Index Card System
 
-This collection of simple scripts helps users manage simple, plain-text collections of flashcards.  It focuses on the essence of flashcard systems: scheduling.  It also provides some very simple programs for displaying flashcards.
+This collection of simple scripts helps users manage simple, plain-text collections of flashcards.  It focuses on the essence of flashcard systems: scheduling.  It also provides some very simple programs for displaying flashcards.  A lot of the inspiration for this project comes from [suckless.org](http://suckless.org "software that sucks less") and [cat-v.org](http://cat-v.org "cat-v: Considered harmful").
 
 "Oboeta" is a Japanese verb in the simple past tense.  It means "remembered" or "memorized".
 
@@ -62,9 +62,9 @@ I wrote most of the code in [Python 3][Python].  (Die-hard Python 2 fans can cry
 ## The Scripts
 
 * `oleitner` -- process the deck and log files and display flashcards that are due for review on standard output
-* `oboeta` -- review some new and due flashcards from a deck using standard input and standard output without explicitly scheduling them (suitable for text-only flashcards, also good for reviewing random cards while ignoring schedules)
-* `review` -- combines `oleitner` and `oboeta`; also suitable for Android environments with [SL4A][SL4A]
-* `httpreview` -- like `oboeta`, but read cards from standard input and serve cards over HTTP on the local host instead of displaying them on the console
+* `oboeta` -- review flashcards from standard input, shuffling and displaying them one at a time on standard output, while reading commands (pass, fail, quit) from a file (usually a named pipe)
+* `oboetatty` -- display cards read from a file (usually a named pipe) one at a time on standard output get user input from standard input, and write the results (pass, fail, quit) to a file (usually a named pipe) (this program is suitable for text-only flashcards)
+* `oboetahttp` -- like `oboetatty`, but read cards from standard input instead and serve the cards as HTML5 over HTTP
 
 ## Installing
 
@@ -73,6 +73,25 @@ Open a terminal, navigate to the directory containing Oboeta's source code, and 
     $ ./install.sh /usr/bin
 
 This will copy the scripts to the specified directory.  You might have to change users (e.g., run `sudo`) depending on which installation directory you select.
+
+## Using
+
+`oleitner` is straightforward: Check out its help message via its `-h` option.
+
+`oboeta` is designed to work with `oboetatty` and `oboetahttp`, though you could write other programs to interact with it.  `oboeta` functions as a flashcard randomizer, chooser, and logger; `oboetatty` and `oboetahttp` focus on displaying the flashcards that `oboeta` chooses.  `oboetatty` will require two named pipes: one for receiving cards from `oboeta` and one for sending commands to `oboeta`.  On the other hand, `oboetahttp` requires only one named pipe, which it uses to send commands to `oboeta`: `oboetahttp` reads cards from standard input.  (See `example/reviewsome` for one way to link `oleitner`, `oboeta`, and `oboetahttp` together.)
+
+For example, suppose your deck has five Leitner buckets with delays of one, three, seven, fourteen, and thirty days, respectively, and you want reviews to have at most 20 old cards and 10 new ones.  If you want to review the cards on the console using fields two and three as the front and back, respectively, then this Bourne shell code will do it:
+
+    mkfifo -m 0700 cardpipe commandpipe
+    ( oleitner -n 20 -e 10 deck.txt deck.log 1 3 7 14 30 | oboeta $commandpipe deck.log 2 3 >$cardpipe ) &
+    oboetatty $cardpipe $commandpipe
+
+If you want to review cards via your favorite web browser, then do this instead:
+
+    mkfifo -m 0700 commandpipe
+    oleitner -n 20 -e 10 deck.txt deck.log 1 3 7 14 30 | oboeta $commandpipe deck.log 2 3 | oboetahttp >$commandpipe
+
+Of course, you can insert your own text processing pipelines between the oboeta scripts.  That's the beauty of writing decoupled text-based programs.  For example, I like to insert a script called `rubify` (see `example/rubify`) between `oleitner` and `oboeta` to transform custom Japanese furigana (ruby) annotations into HTML5 &lt;ruby&gt; tags.
 
 ## Sample Framework Built on Oboeta
 
