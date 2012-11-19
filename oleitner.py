@@ -13,26 +13,29 @@ with this software. If not, see
 <http://creativecommons.org/publicdomain/zero/1.0/>.
 """
 
-import argparse, csv, datetime, heapq, itertools, os.path, random, sys
+import argparse, csv, datetime, itertools, os.path, random, sys
 
 class TRandomSelector(object):
 
   def __init__(self, capacity):
     self.capacity = int(capacity)
     self.sample = []
+    self.counter = 0
     if not self.capacity:
       self.Add = (lambda me: None)
 
   def __iter__(self):
-    for _, _, selected in self.sample:
+    for selected in self.sample:
       yield selected
 
   def Add(self, o):
-    tag = random.random()
-    if len(self.sample) < self.capacity:
-      heapq.heappush(self.sample, (tag, id(o), o))
-    elif tag >= self.sample[0][0]:
-      heapq.heapreplace(self.sample, (tag, id(o), o))
+    self.counter += 1
+    if self.counter <= self.capacity:
+      self.sample.append(o)
+    else:
+      tag = random.randint(0, self.counter)
+      if tag < self.capacity:
+        self.sample[tag] = o
 
 class TBucket(object):
 

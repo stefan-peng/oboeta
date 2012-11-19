@@ -107,7 +107,7 @@ All of the files in this collection have been dedicated to the public domain via
 
 ## Authors
 
-I wrote these scripts by myself primarily for myself, but I hope that others will find it useful.
+I wrote these scripts by myself primarily for myself, but I hope that others will find them useful.
 
 -- Joodan Van (伴上段), 2012年11月04日
 
