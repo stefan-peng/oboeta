@@ -27,11 +27,10 @@ cpipe=reviewsome.$$.command
 cleanup() {
   rm -f $cpipe
 }
-trap cleanup EXIT
-trap cleanup INT
+trap cleanup EXIT INT
 mkfifo -m 0700 $cpipe
 
-osm2 decks/$1.log <decks/$1.txt | rubify | oboeta -2 $cpipe decks/$1.log | awk '
+osm2 -n 30 -e 10 decks/$1.log <decks/$1.txt | rubify | oboeta -2 $cpipe decks/$1.log | awk '
 {
 	for (n = 1; n <= NF - 5; n++) {
 		printf("%s\t", $n)
