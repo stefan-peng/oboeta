@@ -15,6 +15,8 @@ from argparse import *
 from csv import *
 from datetime import *
 from http.server import *
+from http.server import SimpleHTTPRequestHandler
+from itertools import *
 from os import *
 from os.path import *
 from random import *
@@ -32,14 +34,18 @@ parser = ArgumentParser(formatter_class=RawDescriptionHelpFormatter, description
 formatting:
 
   This program expects standard input to be a CSV file.  The -s option controls
-  the field delimiter.  The first field is the flashcard's unique ID.  The
-  second and third fields are the card's front and back sides, respectively.
-  All other fields are ignored.
+  the field delimiter.  The program reads two lines per flashcard: the front
+  and the back sides of the card, respectively.  Both are expected to be CSV-
+  formatted lines.  Each field in a line will be displayed on its own line
+  in the generated HTML.
 
   This program writes single-character lines to standard output representing
-  the results of card reviews.  If the line is "+", then the user passed the
-  card; if it's "-", then he failed; and if it's "q", then the user terminated
-  the quiz.  All such lines end with a single newline (\\n) character.
+  the results of card reviews.  For Leitner-system-based reviews, if the line
+  is "+", then the user passed the card; if it's "-", then he failed.  If the
+  review uses SM-2, then the results will be integers in the range [0,5].
+  In either case, if the output is a line containing just "q", then the user
+  terminated the quiz.  All such lines end with a single newline
+  (\\n) character.
 
 output:
 
@@ -49,6 +55,7 @@ parser.add_argument("-i", "--font-size", default=20, type=int, help="the font si
 parser.add_argument("-n", "--font", default="sans-serif", help="the font used in rendered HTML (default: sans-serif)")
 parser.add_argument("-p", "--port", default=1337, type=int, help="the HTTP server's port (default: 1337)")
 parser.add_argument("-s", "--field-sep", default="\t", help="the CSV field separator (default: \\t)")
+parser.add_argument("-2", "--use-sm2", default=False, action="store_true", help="use the SM-2 algorithm instead of the Leitner system")
 
 args = parser.parse_args()
 ret = 0
@@ -69,7 +76,19 @@ cond = Condition()
 retcode = 0
 running = True
 
-class TServer(BaseHTTPRequestHandler):
+sm2_max = 6
+url_paths = dict(("/" + str(v), str(v) + "\n") for v in range(sm2_max))
+url_paths["/pass"] = "+\n"
+url_paths["/fail"] = "-\n"
+
+html_head = """<!DOCTYPE html><html><head><meta charset="UTF-8" /><title>Review</title></head><body style="text-align: center; font: """ + str(args.font_size) + """pt """ + args.font + """\"><div>"""
+html_mid = {
+  False: """</div><div><a href="/show">Show</a> &middot; <a href="/quit">Quit</a>""",
+  True: "</div><div>" + " &middot; ".join(("<a href=\"/" + str(v) + "\">" + str(v).capitalize() + "</a>" for v in chain(range(sm2_max) if args.use_sm2 else ("pass", "fail"), ("quit",))))
+ }
+html_tail = "</div></body></html>\r\n"
+
+class TServer(SimpleHTTPRequestHandler):
   def do_GET(self):
     global front
     global back
@@ -77,6 +96,9 @@ class TServer(BaseHTTPRequestHandler):
     global stdinreader
     global retcode
     global running
+    if self.path.startswith("/media"):
+      super().do_GET()
+      return
     self.error_content_type = "text/plain"
     if running and self.path != "/favicon.ico":
       if self.path == "/quit":
@@ -90,12 +112,13 @@ class TServer(BaseHTTPRequestHandler):
         return
       if front is not None:
         if showing_back:
-          if self.path.lower() == "/pass":
-            stdout.write("+\n")
-            stdout.flush()
+          if self.path.lower() in url_paths:
+            stdout.write(url_paths[self.path])
           else:
-            stdout.write("-\n")
-            stdout.flush()
+            self.send_error(404)
+            self.end_headers()
+            return
+          stdout.flush()
           front = None
         else:
           showing_back = True
@@ -109,7 +132,7 @@ class TServer(BaseHTTPRequestHandler):
           self.Send("text/plain", "Done!")
           return
         showing_back = False
-      self.Send("text/html", """<!DOCTYPE html><html><head><meta charset="UTF-8" /><title>Review</title></head><body style="text-align: center; font: """ + str(args.font_size) + """pt """ + args.font + """"><div>""" + "<br />".join(back if showing_back else front) + """</div>""" + ("""<div><a href="/fail">Fail</a> &middot; <a href="/pass">Pass</a> &middot; <a href="/quit">Quit</a></div>""" if showing_back else """<div><a href="/show">Show</a> &middot; <a href="/quit">Quit</a></div>""") + """</body></html>\r\n""")
+      self.Send("text/html", html_head + "<br />".join(back if showing_back else front) + html_mid[showing_back] + html_tail)
     else:
       self.send_error(404)
       self.end_headers()

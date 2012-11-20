@@ -1,6 +1,6 @@
-#!/bin/sh
+#!/usr/bin/gawk -f
 
-# Generate a Timestamp Suitable for Logs
+# Transform Kanji Flashcard Lines into Readable Forms for Review Scripts
 # Written in 2012 by 伴上段
 #
 # To the extent possible under law, the author(s) have dedicated all copyright
@@ -11,4 +11,18 @@
 # with this software. If not, see
 # <http://creativecommons.org/publicdomain/zero/1.0/>.
 
-date +'%Y年%m月%d日'
+BEGIN { FS = "\t"; }
+{
+	if (NF > 3 && $4 != "") {
+		printf("%s", $1)
+		for (i = 4; i < NF; i++) {
+			printf("\t%s", $i)
+		}
+		printf("\n")
+	} else {
+		print $1 "\t" $3
+	}
+	printf("%s\t<img src=\"/media/sds/%s.png\">\n", $3, $3)
+	system("")
+}
+

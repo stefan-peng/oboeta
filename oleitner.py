@@ -1,17 +1,15 @@
 #!/usr/bin/env python3
 
-license="""
-Select Lines from a CSV File According to a Leitner Scheduler
-Written in 2012 by 伴上段
-
-To the extent possible under law, the author(s) have dedicated all copyright
-and related and neighboring rights to this software to the public domain
-worldwide. This software is distributed without any warranty.
-
-You should have received a copy of the CC0 Public Domain Dedication along
-with this software. If not, see
-<http://creativecommons.org/publicdomain/zero/1.0/>.
-"""
+# Select Lines from a CSV File According to a Leitner Scheduler
+# Written in 2012 by 伴上段
+#
+# To the extent possible under law, the author(s) have dedicated all copyright
+# and related and neighboring rights to this software to the public domain
+# worldwide. This software is distributed without any warranty.
+#
+# You should have received a copy of the CC0 Public Domain Dedication along
+# with this software. If not, see
+# <http://creativecommons.org/publicdomain/zero/1.0/>.
 
 import argparse, csv, datetime, itertools, os.path, random, sys
 
@@ -244,16 +242,11 @@ output:
   parser.add_argument("-n", "--num-lines", type=int, default=10, dest="num", help="the maximum number of lines with log records to select (default: 10)")
   parser.add_argument("-e", "--num-new-lines", type=int, default=4, dest="new", help="the maximum number of lines without log records to select (default: 4)")
   parser.add_argument("-s", "--field-sep", default="\t", help="the CSV field separator (default: \\t)")
-  parser.add_argument("-f", "--date-format", default="%Y年%m月%d日%H時%M分%S秒", help="the format of dates/timestamps in the log file (uses date/strftime flags, default: %%Y年%%m月%%d日%%H時%%M分%%S秒)")
+  parser.add_argument("-f", "--date-format", default="%Y年%m月%d日", help="the format of dates/timestamps in the log file (uses date/strftime flags, default: %%Y年%%m月%%d日)")
   parser.add_argument("-b", "--show-buckets", default=False, action="store_true", help="just dump the lines to standard output along with their current bucket numbers (the bucket number is the first field of each line in the output, -1 for lines without log entries)")
-  parser.add_argument("-l", "--license", default=False, action="store_true", help="print this program's license to stdout and exit")
   parser.add_argument("deckfile", help="a CSV-formatted file containing scheduled lines")
   parser.add_argument("logfile", help="a CSV-formatted file containing records for the deck's lines")
   parser.add_argument("bucketdelay", type=int, nargs="+", help="the number of days to add to a line's due date when it's moved to the corresponding Leitner bucket")
-
-  if any(arg == "-l" for arg in sys.argv[1:]):
-    print(license)
-    sys.exit(0)
 
   args = parser.parse_args()
   ret = Main(sys.stdout, args.num, args.new, args.bucketdelay, args.logfile, args.deckfile, args.field_sep, args.date_format, args.show_buckets)

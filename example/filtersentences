@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/gawk -f
 
 # Transform Sentence Flashcard Lines into Readable Forms for Review Scripts
 # Written in 2012 by 伴上段
@@ -11,22 +11,22 @@
 # with this software. If not, see
 # <http://creativecommons.org/publicdomain/zero/1.0/>.
 
-awk -W interactive 'BEGIN { FS = "\t"; }
+BEGIN { FS = "\t" }
 {
 	firstsound = 0
-	print $1 "\t" $3;
-	print $4;
-	#for (i = 5; i <= NF; i++) {
-	#	printf("\t");
-	#	if ($i == "音") {
-	#		printf("%s%s", "<audio controls=\"controls\"><source src=\"media/recordings/flashcards/ロー/", $2);
-	#		if (firstsound != 0) {
-	#			printf("." firstsound);
-	#		}
-	#		printf(".wav\" type=\"audio/wav\">Your browser does not support the audio tag.</audio>");
-	#		firstsound = firstsound + 1;
-	#	}
-	#}
-	#printf("\n");
-}'
+	print $1 "\t" $3
+	printf("%s", $4)
+	for (i = 5; i <= NF; i++) {
+		if ($i == "音") {
+			printf("\t<a href=\"javascript:window.open('/media/recordings/flashcards/ロー/%s", $2)
+			if (firstsound != 0) {
+				printf("." firstsound)
+			}
+			printf(".wav')\">Listen to Audio</a>")
+			firstsound = firstsound + 1
+		}
+	}
+	printf("\n")
+	system("")
+}
 
