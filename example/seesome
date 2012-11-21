@@ -31,5 +31,12 @@ trap cleanup EXIT
 trap cleanup INT
 mkfifo -m 0700 $cpipe
 
-oleitner -n 30 -e 20 decks/$1.txt decks/$1.log 1 3 7 14 30 90 180 | rubify | oboeta -d $cpipe decks/$1.log | $2 | oboetahttp -n '\"HanaMinA\", sans-serif' -i 48 >$cpipe 
+osm2 -n 30 -e 10 decks/$1.log <decks/$1.txt | rubify | oboeta -d -2 $cpipe decks/$1.log | awk '
+{
+	for (n = 1; n <= NF - 5; n++) {
+		printf("%s\t", $n)
+	}
+	printf("%s\n", $(NF - 4))
+	system("")
+}' | $2 | oboetahttp -2 -n '\"HanaMinA\", sans-serif' -i 48 >$cpipe 
 

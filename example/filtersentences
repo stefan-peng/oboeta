@@ -18,7 +18,7 @@ BEGIN { FS = "\t" }
 	printf("%s", $4)
 	for (i = 5; i <= NF; i++) {
 		if ($i == "音") {
-			printf("\t<a href=\"javascript:window.open('/media/recordings/flashcards/ロー/%s", $2)
+			printf("\t<a href=\"javascript:window.open('/media/recordings/flashcards/ロー/%s", $1)
 			if (firstsound != 0) {
 				printf("." firstsound)
 			}
