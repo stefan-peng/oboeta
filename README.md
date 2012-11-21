@@ -90,7 +90,7 @@ It gets a little more complicated, though.  You have to break up the single-line
 Let's check out some example pipelines.  Suppose your deck uses the SM-2 algorithm and you want reviews to have at most 20 old cards and 10 new ones.  If you want to review the cards on the console using fields two and three as the front and back, respectively, then this Bourne shell code will do it:
 
     mkfifo -m 0700 cardpipe commandpipe
-    ( osm2 -n 20 -e 10 deck.log &lt;deck.txt | oboeta $commandpipe deck.log 2 3 | awk '{
+    ( osm2 -n 20 -e 10 deck.log <deck.txt | oboeta $commandpipe deck.log | awk '{
       print $2
       print $3
       system("")  # to flush awk's stdout buffer
@@ -100,7 +100,7 @@ Let's check out some example pipelines.  Suppose your deck uses the SM-2 algorit
 If you want to review cards via your favorite web browser, then do this instead:
 
     mkfifo -m 0700 commandpipe
-    oleitner -n 20 -e 10 deck.txt deck.log 1 3 7 14 30 | oboeta $commandpipe deck.log 2 3 | awk '{
+    osm2 -n 20 -e 10 deck.log <deck.txt | oboeta $commandpipe deck.log | awk '{
       print $2
       print $3
       system("")  # to flush awk's stdout buffer
