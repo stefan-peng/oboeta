@@ -132,7 +132,7 @@ class TServer(SimpleHTTPRequestHandler):
           self.Send("text/plain", "Done!")
           return
         showing_back = False
-      self.Send("text/html", html_head + "<br />".join(back if showing_back else front) + html_mid[showing_back] + html_tail)
+      self.Send("text/html", html_head + "<br />".join(front) + ("<hr />" + "<br />".join(back) if showing_back else "") + html_mid[showing_back] + html_tail)
     else:
       self.send_error(404)
       self.end_headers()
