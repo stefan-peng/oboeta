@@ -1,5 +1,5 @@
 
-# The Oboeta Hybrid Index Card System
+# The Oboeta Hybrid Flashcard System
 
 This collection of simple scripts helps users manage simple, plain-text collections of flashcards.  It focuses on the essence of flashcard systems: scheduling.  It also provides some very simple programs for displaying flashcards.  A lot of the inspiration for this project comes from [suckless.org](http://suckless.org "software that sucks less") and [cat-v.org](http://cat-v.org "cat-v: Considered harmful").
 
@@ -65,11 +65,14 @@ I wrote most of the code in [Python 3][Python].  (Die-hard Python 2 fans can cry
 
 ## The Scripts
 
+All of these scripts only depend on the standard Python 3 libraries.  They can be executed independently but are designed to be plugged together via UNIX pipes or temporary files.
+
 * `oleitner` -- process the deck and log files using the Leitner system and display flashcards that are due for review on standard output
 * `osm2` -- like `oleitner`, but use SM-2 instead of the Leitner system
 * `oboeta` -- review flashcards from standard input, shuffling and displaying them one at a time on standard output, while reading commands (pass, fail, quit) from a file (usually a named pipe)
 * `oboetatty` -- display cards read from a file (usually a named pipe) one at a time on standard output get user input from standard input, and write the results (pass, fail, quit) to a file (usually a named pipe) (this program is suitable for text-only flashcards)
 * `oboetahttp` -- like `oboetatty`, but read cards from standard input instead and serve the cards as HTML5 over HTTP
+* `ocloze` -- generate cloze deletion flashcards from standard input
 
 ## Installing
 
@@ -106,15 +109,13 @@ If you want to review cards via your favorite web browser, then do this instead:
       system("")  # to flush awk's stdout buffer
      }' | oboetahttp >$commandpipe
 
-Of course, you can insert your own text processing pipelines between the oboeta scripts.  That's the beauty of writing decoupled text-based programs.  For example, I like to insert a script called `rubify` (see `example/rubify`) between `osm2` and `oboeta` to transform custom Japanese furigana (ruby) annotations into HTML5 &lt;ruby&gt; tags.
+Of course, you can insert your own text processing pipelines between the oboeta scripts.  That's the beauty of writing decoupled text-based programs.  For example, I like to insert a script between `osm2` and `oboeta` to transform custom Japanese furigana (rubi) annotations into HTML5 &lt;ruby&gt; tags.
+
+See `ocloze`'s help message (`-h` option) for information about how to use it.
 
 ## Sample Framework Built on Oboeta
 
-If you want an example of a framework built on top of Oboeta, see the "example" subdirectory.  It contains my Japanese flashcard system along with an early snapshot of my sentence deck and log.  I use all of the scripts in the directory; you're free to use them, too.  NOTE: Some of the Japanese-specific scripts depend on [Hinomoto][Hinomoto], a small collection of programs for parsing and tagging Unicode text.  Of course, you can remove these dependencies.  Most of the scripts use the Bourne shell (`sh`) and the standard `awk` (actually, some rely on `gawk`), `date`, `sed`, and `sort` utilities.
-
-My system works like this: I place the scripts into a directory and create four subdirectories: decks, media, backups, and other.  "decks" contains my deck and log files.  "media" contains two subdirectories: "sds" for downloaded kanji stroke order diagrams and "recordings" for audio recordings of my flashcards.  "backups" is where I store bzipped TAR archives of flashcards and media.  "other" contains miscellaneous stuff.
-
-The most essential scripts are `edeck`, `genline`, `pass`, `fail`, `grabsome`, and `reviewsome`.  They should be easy to understand: Open them with your favorite text editor and check them out.
+If you want an example of a framework built on top of Oboeta, see my [Honden](https://github.com/joodan-van-github/honden) repo.  It contains my Japanese flashcard system along with an early snapshot of my sentence deck and log.
 
 ## License
 
@@ -132,4 +133,3 @@ I wrote these scripts by myself primarily for myself, but I hope that others wil
 [Python]: http://www.python.org/download/releases/ "Python Releases"
 [Hinomoto]: https://github.com/joodan-van-github/hinomoto "The Hinomoto Script Collection"
 [SL4A]: http://code.google.com/p/android-scripting "The Scripting Layer for Android"
-

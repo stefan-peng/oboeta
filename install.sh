@@ -26,4 +26,4 @@ install -m 0555 osm2.py $1/osm2
 install -m 0555 oboeta.py $1/oboeta
 install -m 0555 oboetahttp.py $1/oboetahttp
 install -m 0555 oboetatty.py $1/oboetatty
-
+install -m 0555 ocloze.py $1/ocloze
