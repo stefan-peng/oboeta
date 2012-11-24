@@ -51,22 +51,16 @@ output:
 
   This program will serve HTML via the specified port (-p option).  Use your
   web browser to view the cards.""")
-parser.add_argument("-i", "--font-size", default=20, type=int, help="the font size, in points (default: 20)")
+parser.add_argument("-i", "--font-size", default="20pt", help="the font size, including units (default: 20pt)")
 parser.add_argument("-n", "--font", default="sans-serif", help="the font used in rendered HTML (default: sans-serif)")
 parser.add_argument("-p", "--port", default=1337, type=int, help="the HTTP server's port (default: 1337)")
 parser.add_argument("-s", "--field-sep", default="\t", help="the CSV field separator (default: \\t)")
 parser.add_argument("-2", "--use-sm2", default=False, action="store_true", help="use the SM-2 algorithm instead of the Leitner system")
 
 args = parser.parse_args()
-ret = 0
-if args.font_size <= 0:
-  stderr.write("font size must be positive\n")
-  ret = 1
 if args.port <= 0 or args.port > 65535:
   stderr.write("illegal port number\n")
-  ret = 1
-if ret != 0:
-  exit(ret)
+  exit(1)
 
 front = None
 back = None
@@ -81,7 +75,7 @@ url_paths = dict(("/" + str(v), str(v) + "\n") for v in range(sm2_max))
 url_paths["/pass"] = "+\n"
 url_paths["/fail"] = "-\n"
 
-html_head = """<!DOCTYPE html><html><head><meta charset="UTF-8" /><title>Review</title></head><body style="text-align: center; font: """ + str(args.font_size) + """pt """ + args.font + """\"><div>"""
+html_head = """<!DOCTYPE html><html><head><meta charset="UTF-8" /><title>Review</title></head><body style="text-align: center; font: """ + str(args.font_size) + """ """ + args.font + """\"><div>"""
 html_mid = {
   False: """</div><div><a href="/show">Show</a> &middot; <a href="/quit">Quit</a>""",
   True: "</div><div>" + " &middot; ".join(("<a href=\"/" + str(v) + "\">" + str(v).capitalize() + "</a>" for v in chain(range(sm2_max) if args.use_sm2 else ("pass", "fail"), ("quit",))))
