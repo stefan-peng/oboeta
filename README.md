@@ -115,7 +115,7 @@ See `ocloze`'s help message (`-h` option) for information about how to use it.
 
 ## Sample Framework Built on Oboeta
 
-If you want an example of a framework built on top of Oboeta, see my [Honden](https://github.com/joodan-van-github/honden) repo.  It contains my Japanese flashcard system along with an early snapshot of my sentence deck and log.
+If you want an example of a framework built on top of Oboeta, see my [Honden](https://github.com/joodan-van-github/honden) repo.
 
 ## License
 
