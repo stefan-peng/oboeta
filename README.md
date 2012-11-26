@@ -18,7 +18,7 @@ I love electronic flashcards.  There are so many things to like about them:
 5. Electronic flashcards are easy to back up and transport.
 6. They occupy very little physical space.  (Hence (5).)
 
-But I also hate the most popular flashcard programs, such as [Anki][Anki].  They're complex, buggy, too generic, and tied to GUIs and storage formats that make my skin crawl.  (OK, SQLite isn't too bad, but extracting data from it is still a pain in the ass.)  I tried many programs and was never satisfied.  All I wanted was something that operated on plain text and separated flashcards from their metadata.
+But I also hate the most popular flashcard programs, such as [Anki][Anki].  They're complex, buggy, too restrictive, and tied to GUIs and storage formats that make my skin crawl.  (OK, SQLite isn't too bad, but extracting data from it is still a pain in the ass.)  I tried many programs and was never satisfied.  All I wanted was something that operated on plain text and separated flashcards from their metadata.
 
 Plain text is an awesome way to store flashcards and their metadata because:
 
