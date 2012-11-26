@@ -31,7 +31,7 @@ And then there's my love for paper flashcards.  I admit that they're a pain to c
 
 1. You can format paper flashcards however you want.  No supporting tools or complicated formatting algorithms are necessary: Just write what you want and be done with it.
 2. Sometimes paper flashcards are easier to carry around and faster to use than a smart phone.  I have a little plastic pencil case that I bought for about $5 into which my B7-sized flashcards fit perfectly.  All I have to do to access them is unzip the case and pull them out.
-3. For people learning new languages with difficult writing systems (such as East Asian languages), paper flashcards forces them to practice writing.  Typing doesn't help.
+3. For people learning new languages with difficult writing systems (such as East Asian languages), paper flashcards force them to practice writing.  Typing doesn't help.
 4. Some people feel better when they use paper flashcards.  I'm one of them.  I don't understand why, but I get that mysteriously good feeling that a lot of people say they have when they use paper products rather than electronic devices (e.g., for reading).
 5. Paper flashcards grab attention.  Smart phones and laptops don't do that because they're common and everyone around the user assumes she's playing games, sending messages, or surfing the web.  For language learners, the best thing about grabbing people's attention with flashcards is that it creates opportunities to practice.  Curious people start conversations, which lead to new sentences, which lead to new flashcards.  It's a beautiful circle.
 
@@ -45,10 +45,10 @@ The second scheduling system is a slight variation of [version 2 of the SuperMem
 
 Here's how the overall system works: You maintain a collection of (paper) flashcards organized any way you like provided that each one has a unique identifier.  (I use monotonically-increasing positive integers for mine.)  On the electronic side, you maintain two plain UTF-8-encoded text files:
 
-1. a [CSV][CSV] file (the "deck") containing one flashcard per line, each beginning with the flashcard's unique identifier; and
-2. a CSV file (the "log") containing records of flashcard reviews.
+1. a [DSV][DSV] file (the "deck") containing one flashcard per line, each beginning with the flashcard's unique identifier; and
+2. a DSV file (the "log") containing records of flashcard reviews.
 
-Oboeta is agnostic about the deck's data: It only expects that the file is a CSV file and that the first field of each line is a unique identifier.  You can format everything else however you want.  This makes adding, editing, and reformatting flashcards a cinch: Just edit the deck file.  You can use any text-manipulating program to do this.
+Oboeta is agnostic about the deck's data: It only expects that the file is a DSV file and that the first field of each line is a unique identifier.  You can format everything else however you want.  This makes adding, editing, and reformatting flashcards a cinch: Just edit the deck file.  You can use any text-manipulating program to do this.
 
 On the other hand, the requirements for the log are more stringent:
 
@@ -129,7 +129,7 @@ I wrote these scripts by myself primarily for myself, but I hope that others wil
 
 [Flashcards]: http://en.wikipedia.org/wiki/Flashcards#Systems "Flashcards on Wikipedia"
 [Anki]: http://ankisrs.net/ "The Anki SRS Program"
-[CSV]: http://en.wikipedia.org/wiki/Comma-separated_values "Comma-Separated Values on Wikipedia"
+[DSV]: http://en.wikipedia.org/wiki/Delimiter-separated_values "Delimiter-Separated Values on Wikipedia"
 [Python]: http://www.python.org/download/releases/ "Python Releases"
 [Hinomoto]: https://github.com/joodan-van-github/hinomoto "The Hinomoto Script Collection"
 [SL4A]: http://code.google.com/p/android-scripting "The Scripting Layer for Android"
