@@ -86,28 +86,30 @@ This will copy the scripts to the specified directory.  You might have to change
 
 `oleitner` is straightforward: Check out its help message via its `-h` option.  `osm2`'s input and output formatting are a little more complicated, but the command's invocation is simpler than `oleitner`'s.  Check out its help message via its `-h` option for details.
 
-`oboeta` is designed to work with `oboetatty` and `oboetahttp`, though you could write other programs to interact with it.  `oboeta` functions as a flashcard randomizer, chooser, and logger; `oboetatty` and `oboetahttp` focus on displaying the flashcards that `oboeta` chooses.  `oboetatty` will require two named pipes: one for receiving cards from `oboeta` and one for sending commands to `oboeta`.  On the other hand, `oboetahttp` requires only one named pipe, which it uses to send commands to `oboeta`: `oboetahttp` reads cards from standard input.  (See the [Honden](https://github.com/joodan-van-github/honden) repo for some examples of how to hook these scripts together.)
+`oboeta` is designed to work with `oboetatty` and `oboetahttp`, though you could write other programs to interact with it.  `oboeta` functions as a flashcard randomizer, chooser, and logger; `oboetatty` and `oboetahttp` focus on displaying the flashcards that `oboeta` chooses.  `oboetatty` requires two named pipes: one for receiving cards from `oboeta` and one for sending commands to `oboeta`.  On the other hand, `oboetahttp` requires only one named pipe, which it uses to send commands to `oboeta`: `oboetahttp` reads cards from standard input.  (See the [Honden](https://github.com/joodan-van-github/honden) repo for some examples of how to hook these scripts together.)
 
 It gets a little more complicated, though.  You have to break up the single-line cards that `oboeta` prints into two lines per card before feeding them to `oboetatty` or `oboetahttp`.  (The first line contains the front side's fields and the second line contains the back side's fields.)  `sed` and `awk` scripts can handle this job.
 
 Let's check out some example pipelines.  Suppose your deck uses the SM-2 algorithm and you want reviews to have at most 20 old cards and 10 new ones.  If you want to review the cards on the console using fields two and three as the front and back, respectively, then this Bourne shell code will do it:
 
     mkfifo -m 0700 cardpipe commandpipe
-    ( osm2 -n 20 -e 10 deck.log <deck.txt | oboeta $commandpipe deck.log | awk '{
+    ( osm2 -n 20 -e 10 deck.log <deck.txt | oboeta -2 $commandpipe deck.log | awk '{
       print $2
       print $3
       system("")  # to flush awk's stdout buffer
      }' >$cardpipe ) &
-    oboetatty $cardpipe $commandpipe
+    oboetatty -2 $cardpipe $commandpipe
+
+The -2 flags enable SM-2 support in `oboeta` and `oboetatty`.
 
 If you want to review cards via your favorite web browser, then do this instead:
 
     mkfifo -m 0700 commandpipe
-    osm2 -n 20 -e 10 deck.log <deck.txt | oboeta $commandpipe deck.log | awk '{
+    osm2 -n 20 -e 10 deck.log <deck.txt | oboeta -2 $commandpipe deck.log | awk '{
       print $2
       print $3
       system("")  # to flush awk's stdout buffer
-     }' | oboetahttp >$commandpipe
+     }' | oboetahttp -2 >$commandpipe
 
 Of course, you can insert your own text processing pipelines between the oboeta scripts.  That's the beauty of writing decoupled text-based programs.  For example, I like to insert a script between `osm2` and `oboeta` to transform custom Japanese furigana (rubi) annotations into HTML5 &lt;ruby&gt; tags.
 

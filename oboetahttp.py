@@ -146,7 +146,8 @@ class TServer(SimpleHTTPRequestHandler):
 server = HTTPServer(('', args.port), TServer)
 def ServeIt():
   server.serve_forever()
-serverthread = Thread(target=ServeIt, daemon=True)
+serverthread = Thread(target=ServeIt)
+serverthread.daemon = True
 serverthread.start()
 try:
   with cond:
